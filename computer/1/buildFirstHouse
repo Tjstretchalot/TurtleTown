@@ -1,0 +1,13 @@
+if not house then shell.run('houseUtils') end
+
+local FIRST_COBBLE_IND = 5
+local SECOND_COBBLE_IND = 9
+
+house.buildingIndex = FIRST_COBBLE_IND
+turtle.select(FIRST_COBBLE_IND)
+house.walls(9, 6, 3, SECOND_COBBLE_IND)
+turtle.select(8)
+house.gotoFloorAfterWalls(3)
+house.cleanupHouseObject()
+house.floor(9, 6, 8)
+house.cleanupHouseObject()

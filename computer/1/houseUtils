@@ -1,0 +1,104 @@
+if house then return end
+if not move then shell.run("moveUtils") end
+
+house = {}
+
+local function placeDown(replBlock)
+  if not replBlock or not house.buildingIndex or house.onSecondStack then 
+    turtle.placeDown()
+	return
+  end
+  turtle.placeDown()
+  if turtle.getItemCount(house.buildingIndex) == 0 then
+    turtle.select(replBlock)
+	turtle.placeDown()
+	house.onSecondStack = true
+  end
+end
+
+local function replaceBelow(replBlock)
+  turtle.digDown()
+  placeDown(replBlock)
+end
+
+local function doWallLength(size, height, replBlock)
+  if not size or not height then return end
+  for i=1, size - 1, 1 do
+    move.forward()
+    move.down(height - 1)
+    for i=1, height - 1, 1 do
+  	  placeDown(replBlock)
+ 	  move.up()
+    end
+    placeDown(replBlock)
+  end  
+end
+
+local function doFloorLength(size, replBlock)
+  if not size then return end
+  
+  replaceBelow(replBlock)
+  for i=1, size - 1, 1 do
+    move.forward()
+	replaceBelow(replBlock)
+  end
+end
+
+function house.walls(width, length, height, replBlock) 
+  if not width or not length or not height then return end
+  
+  for i=1, height, 1 do
+    move.up()
+	placeDown(replBlock)
+  end
+  
+  doWallLength(length, height, replBlock)
+  turtle.turnLeft()
+  doWallLength(width, height, replBlock)
+  turtle.turnLeft()
+  doWallLength(length, height, replBlock)
+  turtle.turnLeft()
+  doWallLength(width - 1, height, replBlock)
+  move.forward()
+end
+
+function house.gotoFloorAfterWalls(height)
+  if not height then return end
+  turtle.turnLeft()
+  move.left()
+  move.forward()
+  move.down(height)
+end
+
+function house.floor(width, length, replBlock)
+  if not width or not length then return end
+  width = width - 2 -- don't need to do under the walls
+  length = length - 2
+  
+  for i=1, width - 1, 1 do
+    doFloorLength(length, replBlock)
+	if i % 2 == 1 then
+	  turtle.turnLeft()
+	  move.forward()
+	  turtle.turnLeft()
+	else
+	  turtle.turnRight()
+	  move.forward()
+	  turtle.turnRight()
+	end
+  end
+  doFloorLength(length, replBlock)
+  if width % 2 == 1 then
+    move.back(length - 1)
+	move.turnAround()
+  end
+  
+  turtle.turnLeft()
+  forward(width - 1)
+  turtle.turnLeft()
+end
+
+function house.cleanupHouseObject()
+  house.buildingIndex = nil
+  house.onSecondStack = nil
+end

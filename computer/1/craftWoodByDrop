@@ -1,0 +1,84 @@
+if not move then shell.run("moveUtils") end
+local function dropStuff()
+  turtle.select(7)
+  turtle.digDown()
+  turtle.select(1)
+  turtle.dropDown()
+
+  move.back()
+  move.right()
+
+  turtle.select(7)
+  turtle.digDown()
+  turtle.select(2)
+  turtle.dropDown()
+  turtle.select(3)
+  turtle.dropDown()
+  
+  move.forward()
+  move.right()
+  turtle.select(7)
+  turtle.digDown()
+  turtle.select(5)
+  turtle.dropDown()
+  
+  move.back()
+  move.right()
+  turtle.select(7)
+  turtle.digDown()
+  turtle.select(6)
+  turtle.dropDown()
+  
+  move.forward()
+  move.right()
+  turtle.select(7)
+  turtle.digDown()
+  turtle.dropDown()
+end
+
+local function getStuff()
+  turtle.select(7)
+  turtle.suckDown()
+  turtle.select(7)
+  turtle.placeDown()
+  
+  move.back()
+  move.left()
+  turtle.select(6)
+  turtle.suckDown()
+  turtle.select(7)
+  turtle.placeDown()
+  
+  move.forward()
+  move.left()
+  turtle.select(5)
+  turtle.suckDown()
+  turtle.select(7)
+  turtle.placeDown()
+  
+  move.back()
+  move.left()
+  turtle.select(3)
+  turtle.suckDown()
+  turtle.select(2)
+  turtle.suckDown()
+  turtle.select(7)
+  turtle.placeDown()
+  
+  move.forward()
+  move.left()
+  turtle.select(1)
+  turtle.suckDown()
+  turtle.select(7)
+  turtle.placeDown()
+  
+  turtle.select(1)
+end
+
+
+dropStuff()
+
+turtle.select(8)
+turtle.craft()
+
+getStuff()

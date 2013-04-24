@@ -1,0 +1,57 @@
+move = { } -- movement object.
+function move.turnAround()
+  turtle.turnLeft()
+  turtle.turnLeft()
+end
+
+function move.up(times)
+  times = times or 1
+  for i=1, times, 1 do
+    while not turtle.up() do
+	  print("Something is stopping the turtle from going up")
+	  sleep(2)
+	end
+  end
+end
+
+function move.down(times)
+  times = times or 1
+  for i=1, times, 1 do
+    while not turtle.down() do
+	  print("Something is stopping the turtle from going down")
+	  sleep(2)
+	end
+  end
+end
+
+function move.forward(times)
+  times = times or 1
+  for i=1, times, 1 do
+    while not turtle.forward() do
+	  print("Something is stopping the turtle from going forward")
+	  sleep(2)
+	end
+  end
+end
+
+function move.back(times)
+  times = times or 1
+  for i=1, times, 1 do
+    while not turtle.back() do
+	  print("Something is stopping the turtle from going back")
+	  sleep(2)
+	end
+  end
+end
+
+function move.left(times)
+  turtle.turnLeft()
+  move.forward(times)
+  turtle.turnRight()
+end
+
+function move.right(times)
+  turtle.turnRight()
+  move.forward(times)
+  turtle.turnLeft()
+end

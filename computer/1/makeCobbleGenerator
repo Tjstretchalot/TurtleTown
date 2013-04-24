@@ -1,0 +1,128 @@
+-- This makes a cobble generator
+if not move then shell.run("moveUtils") end
+
+local LAVA_BUCKET = 1
+local WATER_BUCKET1 = 2
+local WATER_BUCKET2 = 3
+local COBBLESTONE = 5
+
+local function digSpotsOut()
+  move.right(2)
+  turtle.digDown()
+  
+  move.forward(2)
+  move.left(2)
+  turtle.digDown()
+  
+  move.left(2)
+  move.back(2)
+  turtle.digDown()
+  
+  move.back(2)
+  move.right(2)
+  turtle.digDown()
+end
+
+local function placeLava()
+  move.forward(2)
+  move.up()
+  move.left()
+  turtle.select(COBBLESTONE)
+  turtle.placeDown()
+  move.right(2)
+  turtle.placeDown()
+  move.forward()
+  move.left()
+  turtle.placeDown()
+  move.back(2)
+  turtle.placeDown()
+  move.forward()
+  turtle.select(LAVA_BUCKET)
+  turtle.placeDown()
+  
+end
+
+local function placeWaterSurroundings()
+  turtle.select(COBBLESTONE)
+  move.back(3)
+  move.left()
+  turtle.placeDown()
+  move.right(2)
+  turtle.placeDown()
+  move.back()
+  move.left()
+  turtle.placeDown()
+  
+  move.forward(4)
+  
+  move.right(3)
+  move.forward()
+  turtle.placeDown()
+  move.back(2)
+  turtle.placeDown()
+  move.right()
+  move.forward()
+  turtle.placeDown()
+  
+  move.left(7)
+  
+  move.forward()
+  turtle.placeDown()
+  move.back(2)
+  turtle.placeDown()
+  move.left()
+  move.forward()
+  turtle.placeDown()
+  
+  move.right(4)
+  
+  move.forward(3)
+  move.left()
+  turtle.placeDown()
+  move.right(2)
+  turtle.placeDown()
+  move.forward()
+  move.left()
+  turtle.placeDown()
+  
+  move.back(4)
+end
+
+local function getWater()
+  move.back(5)
+  move.down()
+  turtle.select(WATER_BUCKET1)
+  turtle.placeDown()
+  sleep(1)
+  turtle.select(WATER_BUCKET2)
+  turtle.placeDown()
+end
+
+local function placeWater()
+  move.left(3)
+  turtle.select(WATER_BUCKET1)
+  turtle.placeDown()
+  
+  move.right(6)
+  turtle.select(WATER_BUCKET2)
+  turtle.placeDown()
+  
+  move.left(3)
+  getWater()
+  move.up()
+  move.forward(2)
+  turtle.select(WATER_BUCKET1)
+  turtle.placeDown()
+  move.forward(6)
+  turtle.select(WATER_BUCKET2)
+  turtle.placeDown()
+  move.back(3)
+end
+
+digSpotsOut()
+placeLava()
+placeWaterSurroundings()
+placeWater()
+getWater()
+move.up()
+move.forward(5)

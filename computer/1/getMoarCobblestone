@@ -1,0 +1,32 @@
+move.right()
+move.forward()
+move.down()
+move.turnAround()
+
+local facingRight = false
+while not hasEnoughCobbleStone() do
+  if facingRight then
+    turtle.turnLeft()
+  else
+    turtle.turnRight()
+  end
+  
+  facingRight = not facingRight
+  
+  while not turtle.detect() do
+    sleep(0.1)
+  end
+  
+  turtle.dig()
+  onGetCobbleStone()
+end
+
+if facingRight then
+  turtle.turnRight()
+else
+  move.turnAround()
+end
+
+move.up()
+move.back()
+move.left()

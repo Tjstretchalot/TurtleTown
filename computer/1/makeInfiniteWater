@@ -1,0 +1,23 @@
+if not move then shell.run("moveUtils") end
+local WATER_BUCKET1 = 2
+local WATER_BUCKET2 = 3
+
+move.back(5)
+turtle.digDown()
+move.right()
+turtle.digDown()
+turtle.select(WATER_BUCKET1)
+turtle.placeDown()
+move.left(2)
+turtle.digDown()
+turtle.select(WATER_BUCKET2)
+turtle.placeDown()
+
+move.right()
+turtle.select(WATER_BUCKET1)
+turtle.placeDown()
+sleep(1)
+turtle.select(WATER_BUCKET2)
+turtle.placeDown()
+move.forward(5)
+
