@@ -17,23 +17,26 @@ shell.run("craftWoodByDrop")
 -- 7: 7 Dirt
 -- 8: 64 Planks
 move.up()
-move.back(8)
-move.left(4)
+move.back(7)
+move.left(3)
+move.down()
+move.turnAround()
 
 cobble = {}
 function cobble.hasEnough() 
   return turtle.getItemCount(9) == 64
 end
 
-local movedToSlot9 = false
+cobble.movedToSlot9 = false
 turtle.select(5)
 function cobble.onGet()
-  if movedToSlot9 then return end
+  if cobble.movedToSlot9 then return end
   if turtle.getItemCount(5) == 64 then
     turtle.select(9)
-	movedToSlot9 = true
+	cobble.movedToSlot9 = true
   end
 end
+turtle.select(5)
 shell.run("getMoarCobblestone")
 move.right(4)
 move.forward(8)

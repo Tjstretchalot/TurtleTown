@@ -8,7 +8,7 @@ local SAPLING = { 6 }
 local DIRT = { 7 } 
 local WOOD_PLANKS = { 8 } 
 
-local ITEMS_TO_DROP = { LAVA_BUCKET, WATER_BUCKET, COBBLESTONE, SAPLING, WOOD, DIRT }
+local ITEMS_TO_DROP = { LAVA_BUCKET, WATER_BUCKET, WOOD_PLANKS, SAPLING, WOOD, DIRT }
 
 local function dropStuff()
   for k, v in pairs(ITEMS_TO_DROP) do
@@ -18,18 +18,19 @@ local function dropStuff()
   end
 end
 
-local function doCraft() 
-  craft.digDown(DIRT)
-  local numWoodPlanks = craft.count(WOOD_PLANKS)
-  local numChests = math.floor(numWoodPlanks / 8)
-  if numWoodPlanks % 8 ~= 0 then
-    local numRemaining = numWoodPlanks % 8
-	for _, v in pairs(WOOD_PLANKS) do
+local function dropExcessCobble()
+  local numCobblestone = craft.count(COBBLESTONE) -- 128
+  local numFurnaces = math.floor(numCobblestone / 8) -- 16
+  if numFurnaces > 2 then numFurnaces = 2 end -- 2
+  if numFurnaces * 8 ~= numCobblestone then 
+    local numRemaining = numCobblestone - (numFurnaces * 8) -- 112
+	local tmpInd = -1
+	for _, v in pairs(COBBLESTONE) do
 	  local amInStack = turtle.getItemCount(v)
-	  if amInStack >= numRemaining then
+	  if amInStack ~= 0 and amInStack >= numRemaining then
+		tmpInd = v
 	    turtle.select(v)
 		turtle.dropDown(numRemaining)
-		break
 	  else
 	    numRemaining = numRemaining - amInStack
 		turtle.select(v)
@@ -37,32 +38,37 @@ local function doCraft()
 	  end
 	end
   end
+  return numFurnaces
+end
+
+local function doCraft() 
+  craft.digDown(DIRT)
+  local numFurnaces = dropExcessCobble()
+  local cobbleTemp = { 9 }
   move.forward(2)
   turtle.select(DIRT[1])
   turtle.digDown(DIRT)
   turtle.dropDown()
   move.back(2)
-  turtle.select(WOOD_PLANKS[1])
-  
+  turtle.select(cobbleTemp[1])
   for i=1, 9, 1 do
     if i ~= 5 then
 	  local tmp = i
 	  if i > 3 then tmp = tmp + 1 end
 	  if i > 6 then tmp = tmp + 1 end 
-	  for k, v in pairs(WOOD_PLANKS) do
+	  for k, v in pairs(cobbleTemp) do
 	    if turtle.getItemCount(v) > 0 then
-          if turtle.getItemCount(v) >= numChests then
+          if turtle.getItemCount(v) >= numFurnaces then
 		    turtle.select(v)
 		    break
 	      else
 		    turtle.select(v)
-			turtle.transferTo(WOOD_PLANKS[k + 1])
-			print("Craziness just happened")
+			turtle.transferTo(cobbleTemp[k + 1])
 		  end
 		end
 	  end
 	  print("transfer to " .. tostring(tmp) .. "(i: " .. tostring(i) .. ")")
-	  turtle.transferTo(tmp, numChests) 
+	  turtle.transferTo(tmp, numFurnaces) 
 	end
   end
   turtle.select(12)
@@ -74,24 +80,17 @@ local function doCraft()
   turtle.placeDown()
   move.back(2)
   
-  turtle.select(WOOD_PLANKS[1])
+  turtle.select(COBBLESTONE[1])
+  turtle.suckDown()
+  turtle.select(COBBLESTONE[2])
   turtle.suckDown()
 end
 
-local function getStuff() -- this should be a loop, I just can't get one to work
-  craft.gobackNext(DIRT, 6)
-  craft.doPickup(DIRT)
-  craft.gobackNext(DIRT, 5)
-  craft.doPickup(WOOD)
-  craft.gobackNext(DIRT, 4)
-  craft.doPickup(SAPLING)
-  craft.gobackNext(DIRT, 3)
-  craft.doPickup(COBBLESTONE)
-  craft.gobackNext(DIRT, 2)
-  craft.doPickup(WATER_BUCKET)
-  craft.gobackNext(DIRT, 1)
-  craft.doPickup(LAVA_BUCKET)
-  
+local function getStuff()
+  for i=#ITEMS_TO_DROP, 1, -1 do
+    craft.gobackNext(DIRT, i)
+	craft.doPickup(ITEMS_TO_DROP[i])
+  end
   turtle.select(DIRT[1])
   turtle.placeDown()
   turtle.select(1)

@@ -1,0 +1,55 @@
+craft = {}
+
+function craft.digDown(dirt)
+  turtle.select(dirt[1])
+  turtle.digDown()
+end
+
+function craft.doDrop(items)
+  for _, v in pairs(items) do
+    turtle.select(v)
+	turtle.dropDown()
+  end
+end
+
+function craft.doPickup(items)
+  for _, v in pairs(items) do
+    turtle.select(v)
+	if not turtle.suckDown() then
+	  turtle.select(items[1])
+	  turtle.transferTo(v, 1)
+	end
+  end
+end
+
+function craft.count(items)
+  local res = 0
+  for _, v in pairs(items) do
+    res = res + turtle.getItemCount(v)
+  end
+  return res
+end
+
+function craft.gotoNext(counter)
+  if counter % 2 == 1 then
+    move.forward()
+	move.left()
+  else
+    move.back()
+	move.left()
+  end
+end
+
+function craft.gobackNext(dirt, counter)
+  if not turtle.detectDown() then
+    turtle.select(dirt[1])
+	turtle.placeDown()
+  end
+  if counter % 2 == 1 then
+    move.back()
+	move.right()
+  else
+    move.forward()
+	move.right()
+  end
+end
