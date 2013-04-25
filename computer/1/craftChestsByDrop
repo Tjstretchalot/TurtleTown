@@ -1,0 +1,154 @@
+local LAVA_BUCKET = { 1 }
+local WATER_BUCKET = { 2, 3 }
+local WOOD = { 4 }
+local COBBLESTONE = { 5, 9 }
+local SAPLING = { 6 }
+local DIRT = { 7 } 
+local WOOD_PLANKS = { 8 } 
+
+local ITEMS_TO_DROP = { LAVA_BUCKET, WATER_BUCKET, COBBLESTONE, SAPLING, WOOD, DIRT }
+
+local function digDown()
+  turtle.select(DIRT[1])
+  turtle.digDown()
+end
+
+local function doDrop(items)
+  for _, v in pairs(items) do
+    turtle.select(v)
+	turtle.dropDown()
+  end
+end
+
+local function doPickup(items)
+  for _, v in pairs(items) do
+    turtle.select(v)
+	if not turtle.suckDown() then
+	  turtle.select(items[1])
+	  turtle.transferTo(v, 1)
+	end
+  end
+end
+
+local function count(items)
+  local res = 0
+  for _, v in pairs(items) do
+    res = res + turtle.getItemCount(v)
+  end
+  return res
+end
+
+local function gotoNext(counter)
+  if counter % 2 == 1 then
+    move.forward()
+	move.left()
+  else
+    move.back()
+	move.left()
+  end
+end
+
+local function gobackNext(counter)
+  if not turtle.detectDown() then
+    turtle.select(DIRT[1])
+	turtle.placeDown()
+  end
+  if counter % 2 == 1 then
+    move.back()
+	move.right()
+  else
+    move.forward()
+	move.right()
+  end
+end
+
+local function dropStuff()
+  for k, v in pairs(ITEMS_TO_DROP) do
+    digDown()
+	doDrop(v)
+	gotoNext(k)
+  end
+end
+
+local function doCraft() 
+  digDown()
+  local numWoodPlanks = count(WOOD_PLANKS)
+  local numChests = math.floor(numWoodPlanks / 8)
+  if numWoodPlanks % 8 ~= 0 then
+    local numRemaining = numWoodPlanks % 8
+	for _, v in pairs(WOOD_PLANKS) do
+	  local amInStack = turtle.getItemCount(v)
+	  if amInStack >= numRemaining then
+	    turtle.select(v)
+		turtle.dropDown(numRemaining)
+		break
+	  else
+	    numRemaining = numRemaining - amInStack
+		turtle.select(v)
+		turtle.dropDown()
+	  end
+	end
+  end
+  move.forward(2)
+  turtle.select(DIRT[1])
+  turtle.digDown()
+  turtle.dropDown()
+  move.back(2)
+  turtle.select(WOOD_PLANKS[1])
+  
+  for i=1, 9, 1 do
+    if i ~= 5 then
+	  local tmp = i
+	  if i > 3 then tmp = tmp + 1 end
+	  if i > 6 then tmp = tmp + 1 end 
+	  for k, v in pairs(WOOD_PLANKS) do
+	    if turtle.getItemCount(v) > 0 then
+          if turtle.getItemCount(v) >= numChests then
+		    turtle.select(v)
+		    break
+	      else
+		    turtle.select(v)
+			turtle.transferTo(WOOD_PLANKS[k + 1])
+			print("Craziness just happened")
+		  end
+		end
+	  end
+	  print("transfer to " .. tostring(tmp) .. "(i: " .. tostring(i) .. ")")
+	  turtle.transferTo(tmp, numChests) 
+	end
+  end
+  turtle.select(12)
+  turtle.craft()
+  
+  turtle.select(DIRT[1])
+  move.forward(2)
+  turtle.suckDown()
+  turtle.placeDown()
+  move.back(2)
+  
+  turtle.select(WOOD_PLANKS[1])
+  turtle.suckDown()
+end
+
+local function getStuff() -- this should be a loop, I just can't get one to work
+  gobackNext(6)
+  doPickup(DIRT)
+  gobackNext(5)
+  doPickup(WOOD)
+  gobackNext(4)
+  doPickup(SAPLING)
+  gobackNext(3)
+  doPickup(COBBLESTONE)
+  gobackNext(2)
+  doPickup(WATER_BUCKET)
+  gobackNext(1)
+  doPickup(LAVA_BUCKET)
+  
+  turtle.select(DIRT[1])
+  turtle.placeDown()
+  turtle.select(1)
+end
+
+dropStuff()
+doCraft()
+getStuff()

@@ -177,6 +177,66 @@ function house.ceiling(width, length, blocksToPlace)
   turtle.turnLeft()
 end
 
+function house.finalTouches(width, length, height, wallIndex) -- this one ends in front of the door, facing in
+  if not width or not length or not height or not wallIndex then return end
+  width = width - 2
+  length = length - 2
+  move.down(height - 2)
+  if length % 2 == 0 then
+	move.forward()
+	turtle.turnRight()
+	
+	turtle.select(wallIndex)
+	turtle.dig()
+	for i=1, length - 3, 1 do
+	  move.left()
+	  turtle.dig()
+	end
+	
+	turtle.turnRight()
+	move.forward(length - 2)
+  else
+    print("Odd lengthed houses final touches not supported atm")
+  end
+  
+  turtle.turnRight()
+  if width % 2 == 1 then
+    move.forward((width - 1) / 2)
+	move.down(1)
+	turtle.turnLeft()
+	
+	turtle.select(wallIndex)
+	turtle.dig()
+	move.up()
+	turtle.dig()
+    turtle.turnRight()
+	move.forward((width - 1) / 2)
+  else
+    print("Even numbered houses final touches not supported atm")
+  end
+  
+  if length % 2 == 0 then
+	move.right()
+	
+	turtle.select(wallIndex)
+	turtle.dig()
+	for i=1, length - 3, 1 do
+	  move.right()
+	  turtle.dig()
+	end
+	
+	turtle.turnLeft()
+	move.forward(length - 2)
+	turtle.turnLeft()
+	
+	move.forward((width - 1) / 2) -- width has to be odd for this part
+	turtle.turnRight()
+	move.down()
+  else
+    print("Odd lengthed houses final touches not supported atm")
+  end
+end
+
 function house.cleanupHouseObject()
   house.placingWith = nil
   house.puttingInto = nil

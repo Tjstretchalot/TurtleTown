@@ -6,6 +6,7 @@ local HEIGHT = 3
 local COBBLESTONE_SLOTS = { 5, 9 }
 local WOOD_SPOTS = { 8 }
 local DIRT_SPOTS = { 7 }
+local CHEST = 12
 
 house.cleanupHouseObject()
 house.walls(WIDTH, LENGTH, HEIGHT, COBBLESTONE_SLOTS)
@@ -16,3 +17,32 @@ house.cleanupHouseObject()
 move.up(2)
 house.ceiling(WIDTH, LENGTH, COBBLESTONE_SLOTS)
 house.cleanupHouseObject()
+house.finalTouches(WIDTH, LENGTH, HEIGHT, COBBLESTONE_SLOTS[0])
+house.cleanupHouseObject()
+
+move.forward(2)
+turtle.turnLeft()
+move.forward(7)
+
+-- craft me some chests bro
+shell.run("craftChestsByDrop")
+
+move.turnAround()
+move.forward(7)
+move.turnRight()
+move.forward(LENGTH - 1)
+move.up()
+move.left((WIDTH - 3) / 2)
+turtle.select(CHEST)
+turtle.placeDown()
+move.right()
+turtle.placeDown()
+move.right(((WIDTH - 3) / 2) - 1)
+move.right((WIDTH - 3) / 2)
+turtle.placeDown()
+move.left()
+turtle.placeDown()
+move.left(((WIDTH - 3) / 2) - 1)
+move.turnAround()
+move.forward(LENGTH - 3)
+move.down()
