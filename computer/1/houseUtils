@@ -17,8 +17,10 @@ local function placeDown(replBlock)
 end
 
 local function replaceBelow(replBlock)
+  turtle.select(7)
   turtle.digDown()
-  placeDown(replBlock)
+  turtle.select(8)
+  turtle.placeDown()
 end
 
 local function doWallLength(size, height, replBlock)
@@ -32,6 +34,16 @@ local function doWallLength(size, height, replBlock)
     end
     placeDown(replBlock)
   end  
+end
+
+local function doCeilingLength(size)
+  if not size then return end
+  
+  turtle.placeUp()
+  for i=1, size - 1, 1 do
+    move.forward()
+	turtle.placeUp()
+  end
 end
 
 local function doFloorLength(size, replBlock)
@@ -94,7 +106,36 @@ function house.floor(width, length, replBlock)
   end
   
   turtle.turnLeft()
-  forward(width - 1)
+  move.forward(width - 1)
+  turtle.turnLeft()
+end
+
+function house.ceiling(width, length) 
+  if not width or not length then return end
+  
+  width = width - 2
+  length = length - 2
+  
+  doCeilingLength(length)
+  for i=1, width - 1, 1 do
+	if i % 2 == 1 then
+	  turtle.turnLeft()
+	  move.forward()
+	  turtle.turnLeft()
+	else
+	  turtle.turnRight()
+	  move.forward()
+	  turtle.turnRight()
+	end
+    doCeilingLength(length)
+  end
+  
+  if width % 2 == 1 then
+    move.turnAround()
+	move.forward(length - 1)
+  end
+  turtle.turnLeft()
+  move.forward(width - 1)
   turtle.turnLeft()
 end
 

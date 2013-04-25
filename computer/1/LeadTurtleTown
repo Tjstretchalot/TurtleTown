@@ -19,7 +19,7 @@ shell.run("makeCobbleGenerator")
 move.back(8)
 move.left(4)
 move.turnAround()
-turtle.down()
+move.down()
 
 shell.run("craftWoodByDrop")
 -- Inventory looks like:
