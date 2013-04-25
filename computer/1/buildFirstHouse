@@ -1,16 +1,18 @@
 if not house then shell.run('houseUtils') end
 
-local FIRST_COBBLE_IND = 5
-local SECOND_COBBLE_IND = 9
+local WIDTH = 9
+local LENGTH = 6
+local HEIGHT = 3
+local COBBLESTONE_SLOTS = { 5, 9 }
+local WOOD_SPOTS = { 8 }
+local DIRT_SPOTS = { 7 }
 
-house.buildingIndex = FIRST_COBBLE_IND
-turtle.select(FIRST_COBBLE_IND)
-house.walls(9, 6, 3, SECOND_COBBLE_IND)
-turtle.select(8)
-house.gotoFloorAfterWalls(3)
 house.cleanupHouseObject()
-house.floor(9, 6, 8)
+house.walls(WIDTH, LENGTH, HEIGHT, COBBLESTONE_SLOTS)
+house.gotoFloorAfterWalls(HEIGHT)
+house.cleanupHouseObject()
+house.floor(WIDTH, LENGTH, DIRT_SPOTS, WOOD_SPOTS)
 house.cleanupHouseObject()
 move.up(2)
-turtle.select(SECOND_COBBLE_IND)
-house.ceiling(9, 6)
+house.ceiling(WIDTH, LENGTH, COBBLESTONE_SLOTS)
+house.cleanupHouseObject()

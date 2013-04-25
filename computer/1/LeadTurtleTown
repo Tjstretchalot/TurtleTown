@@ -35,13 +35,14 @@ move.up()
 move.back(8)
 move.left(4)
 
-function hasEnoughCobbleStone() 
+cobble = {}
+function cobble.hasEnough() 
   return turtle.getItemCount(9) == 64
 end
 
 local movedToSlot9 = false
 turtle.select(5)
-function onGetCobbleStone()
+function cobble.onGet()
   if movedToSlot9 then return end
   if turtle.getItemCount(5) == 64 then
     turtle.select(9)

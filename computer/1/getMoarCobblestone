@@ -4,7 +4,7 @@ move.down()
 move.turnAround()
 
 local facingRight = false
-while not hasEnoughCobbleStone() do
+while not cobble.hasEnough() do
   if facingRight then
     turtle.turnLeft()
   else
@@ -18,7 +18,7 @@ while not hasEnoughCobbleStone() do
   end
   
   turtle.dig()
-  onGetCobbleStone()
+  cobble.onGet()
 end
 
 if facingRight then

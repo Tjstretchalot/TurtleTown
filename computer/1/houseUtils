@@ -1,76 +1,115 @@
+-- House Variables:
+-- placingWith: the current index used to place items
+-- puttingInto: the current index used to put items into
+
 if house then return end
 if not move then shell.run("moveUtils") end
 
 house = {}
 
-local function placeDown(replBlock)
-  if not replBlock or not house.buildingIndex or house.onSecondStack then 
+local function placeDown(blocksToPlace)
+  if not blocksToPlace then 
     turtle.placeDown()
 	return
   end
-  turtle.placeDown()
-  if turtle.getItemCount(house.buildingIndex) == 0 then
-    turtle.select(replBlock)
-	turtle.placeDown()
-	house.onSecondStack = true
+  
+  if not house.placingWith or turtle.getItemCount(house.placingWith) == 0 then
+    for _, v in pairs(blocksToPlace) do
+	  if turtle.getItemCount(v) > 0 then
+	    turtle.select(v)
+		house.placingWith = v
+		break
+	  end
+	end
   end
-end
-
-local function replaceBelow(replBlock)
-  turtle.select(7)
-  turtle.digDown()
-  turtle.select(8)
   turtle.placeDown()
 end
 
-local function doWallLength(size, height, replBlock)
+local function placeUp(blocksToPlace)
+  if not blocksToPlace then 
+    turtle.placeUp()
+	return
+  end
+  
+  if not house.placingWith or turtle.getItemCount(house.placingWith) == 0 then
+    for _, v in pairs(blocksToPlace) do
+	  if turtle.getItemCount(v) > 0 then
+	    turtle.select(v)
+		house.placingWith = v
+		break
+	  end
+	end
+  end
+  turtle.placeUp()
+end
+
+local function replaceBelow(toPutBlocksAt, blocksToPlace)
+  if turtle.detectDown() then
+    if not house.puttingInto or turtle.getItemSpace(house.puttingInto) == 0 then
+      for _, v in pairs(toPutBlocksAt) do
+	    if turtle.getItemSpace(v) > 0 then
+		 house.puttingInto = v
+		  break
+	    end
+	  end
+	end
+	turtle.select(house.puttingInto)
+	turtle.digDown()
+	if house.placingWith then
+      turtle.select(house.placingWith)
+    end
+  end
+  
+  placeDown(blocksToPlace)
+end
+
+local function doWallLength(size, height, blocksToPlace)
   if not size or not height then return end
   for i=1, size - 1, 1 do
     move.forward()
     move.down(height - 1)
     for i=1, height - 1, 1 do
-  	  placeDown(replBlock)
+  	  placeDown(blocksToPlace)
  	  move.up()
     end
-    placeDown(replBlock)
+    placeDown(blocksToPlace)
   end  
 end
 
-local function doCeilingLength(size)
+local function doCeilingLength(size, blocksToPlace)
   if not size then return end
   
-  turtle.placeUp()
+  placeUp(blocksToPlace)
   for i=1, size - 1, 1 do
     move.forward()
-	turtle.placeUp()
+	placeUp(blocksToPlace)
   end
 end
 
-local function doFloorLength(size, replBlock)
+local function doFloorLength(size, toPutBlocksAt, blocksToPlace)
   if not size then return end
-  
-  replaceBelow(replBlock)
+  replaceBelow(toPutBlocksAt, blocksToPlace)
   for i=1, size - 1, 1 do
     move.forward()
-	replaceBelow(replBlock)
+	replaceBelow(toPutBlocksAt, blocksToPlace)
   end
 end
 
-function house.walls(width, length, height, replBlock) 
+function house.walls(width, length, height, blocksToPlace) 
   if not width or not length or not height then return end
   
   for i=1, height, 1 do
     move.up()
-	placeDown(replBlock)
+	placeDown(blocksToPlace)
   end
   
-  doWallLength(length, height, replBlock)
+  doWallLength(length, height, blocksToPlace)
   turtle.turnLeft()
-  doWallLength(width, height, replBlock)
+  doWallLength(width, height, blocksToPlace)
   turtle.turnLeft()
-  doWallLength(length, height, replBlock)
+  doWallLength(length, height, blocksToPlace)
   turtle.turnLeft()
-  doWallLength(width - 1, height, replBlock)
+  doWallLength(width - 1, height, blocksToPlace)
   move.forward()
 end
 
@@ -82,13 +121,13 @@ function house.gotoFloorAfterWalls(height)
   move.down(height)
 end
 
-function house.floor(width, length, replBlock)
+function house.floor(width, length, toPutBlocksAt, blocksToPlace)
   if not width or not length then return end
   width = width - 2 -- don't need to do under the walls
   length = length - 2
   
   for i=1, width - 1, 1 do
-    doFloorLength(length, replBlock)
+    doFloorLength(length, toPutBlocksAt, blocksToPlace)
 	if i % 2 == 1 then
 	  turtle.turnLeft()
 	  move.forward()
@@ -99,7 +138,7 @@ function house.floor(width, length, replBlock)
 	  turtle.turnRight()
 	end
   end
-  doFloorLength(length, replBlock)
+  doFloorLength(length, toPutBlocksAt, blocksToPlace)
   if width % 2 == 1 then
     move.back(length - 1)
 	move.turnAround()
@@ -110,13 +149,12 @@ function house.floor(width, length, replBlock)
   turtle.turnLeft()
 end
 
-function house.ceiling(width, length) 
+function house.ceiling(width, length, blocksToPlace) 
   if not width or not length then return end
-  
   width = width - 2
   length = length - 2
-  
-  doCeilingLength(length)
+
+  doCeilingLength(length, blocksToPlace)
   for i=1, width - 1, 1 do
 	if i % 2 == 1 then
 	  turtle.turnLeft()
@@ -127,7 +165,7 @@ function house.ceiling(width, length)
 	  move.forward()
 	  turtle.turnRight()
 	end
-    doCeilingLength(length)
+    doCeilingLength(length, blocksToPlace)
   end
   
   if width % 2 == 1 then
@@ -140,6 +178,6 @@ function house.ceiling(width, length)
 end
 
 function house.cleanupHouseObject()
-  house.buildingIndex = nil
-  house.onSecondStack = nil
+  house.placingWith = nil
+  house.puttingInto = nil
 end
