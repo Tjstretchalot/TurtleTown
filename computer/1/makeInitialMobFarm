@@ -1,0 +1,666 @@
+local lastSelected = -1
+local function selectDirt()
+  if lastSelected == 16 then return end
+  turtle.select(16)
+  lastSelected = 16
+end
+
+local function selectCobble()
+  if lastSelected > 3 and lastSelected < 16 then
+    if turtle.getItemCount(lastSelected) > 0 then
+      return true
+    end
+  end
+  for i=4, 15, 1 do
+    if turtle.getItemCount(i) > 0 then
+      turtle.select(i)
+      lastSelected = i
+      return true
+    end
+  end
+  return false
+end
+
+local function selectWater1()
+  if lastSelected == 2 then return end
+  lastSelected = 2
+  turtle.select(2)
+end
+
+local function selectWater2()
+  if lastSelected == 3 then return end
+  lastSelected = 3
+  turtle.select(3)
+end
+
+
+local function breakDownOne()
+  selectDirt()
+  move.forward()
+  turtle.digDown()
+  move.forward()
+  turtle.digDown()
+  
+  move.back(2)
+end
+
+local function buildColumn(size)
+  if not size then return end
+  
+  for i=1, size, 1 do
+    selectCobble()
+    turtle.placeDown()
+    turtle.up()
+  end
+  selectCobble()
+  turtle.placeDown()
+end
+
+local function buildLength(size)
+  for i=1, size, 1 do
+    if not turtle.detectDown() then
+      selectCobble()
+      turtle.placeDown()
+    end
+    turtle.forward()
+  end
+  if not turtle.detectDown() then
+    selectCobble()
+    turtle.placeDown()
+  end
+end
+
+local function buildFallArea()
+  move.up(2)
+  buildColumn(25)
+  
+  move.left()
+  move.forward()
+  move.down(25)
+  buildColumn(25)
+  
+  move.forward()
+  move.down(25)
+  buildColumn(25)
+  
+  move.forward()
+  move.right()
+  move.down(25)
+  buildColumn(25)
+  
+  move.right()
+  move.back()
+  move.down(25)
+  buildColumn(25)
+  
+  move.back()
+  move.down(25)
+  buildColumn(25)
+end
+
+local function buildFloor()
+  move.back(2)
+  move.left()
+  move.turnAround()
+  
+  move.forward(7)
+  turtle.turnRight()
+  move.forward(9)
+  move.turnAround()
+  buildLength(18)
+  
+  for i=1, 8, 1 do 
+    if i % 2 == 1 then
+      turtle.turnLeft()
+      move.forward()
+      turtle.turnLeft()
+    else
+      turtle.turnRight()
+      move.forward()
+      turtle.turnRight()
+    end
+    buildLength(18)
+  end
+ 
+  turtle.turnLeft()
+  move.forward()
+  turtle.turnLeft()
+  buildLength(8)
+  move.forward(3)
+  buildLength(8)
+  turtle.turnRight()
+  move.forward()
+  turtle.turnRight()
+  buildLength(8)
+  move.forward(3)
+  buildLength(8)
+  for i=1, 9, 1 do 
+    if i % 2 == 1 then
+      turtle.turnLeft()
+      move.forward()
+      turtle.turnLeft()
+    else
+      turtle.turnRight()
+      move.forward()
+      turtle.turnRight()
+    end
+    buildLength(18)
+  end
+end
+
+local function getMoreCobble1() 
+  move.back(9)
+  turtle.turnLeft()
+  move.forward(20)
+  move.down(26)
+  move.right()
+  move.turnAround()
+  move.down()
+  
+  for i=15, 10, -1 do
+    turtle.select(i)
+    turtle.transferTo((15 - i) + 4)
+  end
+  turtle.select(1)
+  shell.run("getMoarCobblestone")
+  move.forward()
+  move.turnAround()
+  move.up(26) 
+  move.forward(20)
+  turtle.turnLeft()
+  move.forward(9)
+end
+
+local function buildWalls()
+  turtle.turnLeft()
+  if not house then shell.run("houseUtils") end
+  
+  house.walls(19, 20, 5, { 4, 5, 6, 7, 8, 9, 10 })
+  house.cleanupHouseObject()
+  house.gotoFloorAfterWalls(5)
+end
+
+local function innerBuildInside()
+  selectCobble()
+  turtle.placeDown()
+  move.left()
+  selectCobble()
+  turtle.placeDown()
+  move.left()
+  selectCobble()
+  turtle.placeDown()
+end
+
+local function getMoreCobble2() 
+  move.up(2)
+  move.forward()
+  turtle.turnLeft()
+  move.forward(17)
+  move.down(31)
+  turtle.turnLeft()
+  move.forward(8)
+  turtle.turnLeft()
+  for i=15, 10, -1 do
+    turtle.select(i)
+    turtle.transferTo((15 - i) + 4)
+  end
+  turtle.select(1) 
+  move.down()
+  shell.run("getMoarCobblestone")
+  move.turnAround()
+  move.back()
+  move.up(31)
+  move.forward()
+  turtle.turnLeft()
+  move.forward(9)
+  turtle.turnRight()
+  move.forward(16)
+  turtle.turnLeft()
+  move.back()
+  move.down(2)
+end
+
+local function do3x3Thing(height)
+  for k=1, height, 1 do
+    for i=1, 3, 1 do
+      move.forward()
+	  move.right(2)
+  	  innerBuildInside()
+    end
+    if k < height then
+	  move.back(3)
+	  move.up()
+	end
+  end
+end
+
+local function doSide(skipTwo, numCycles, height)
+  if not numCycles then numCycles = 3 end
+  if not height then height = 2 end
+  move.back(2)
+  turtle.turnLeft()
+  for i=1, numCycles, 1 do
+    if skipTwo and i == 2 then
+      move.forward()
+      move.down()
+	else
+	  move.forward(2)
+	  move.down()
+	end
+    do3x3Thing(height)
+  end
+end
+
+local function buildInside()
+  move.up()
+  innerBuildInside()
+  
+  for i=1, 7, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end
+  move.forward(2)
+  for i=1, 8, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end 
+  turtle.turnLeft()
+  move.forward()
+  innerBuildInside()
+  for i=1, 4, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end
+  move.forward()
+  for i=1, 8, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end
+  
+  turtle.turnLeft()
+  move.forward()
+  innerBuildInside()
+  for i=1, 4, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end
+  move.forward(2)
+  for i=1, 8, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end
+  
+  turtle.turnLeft()
+  move.forward()
+  innerBuildInside()
+  for i=1, 4, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end
+  move.forward()
+  for i=1, 5, 1 do
+    move.forward()
+	move.right(2)
+	innerBuildInside()
+  end 
+  
+  move.up()
+  for k=1, 2, 1 do
+    for i=1, 3, 1 do
+      move.forward()
+	  move.right(2)
+  	  innerBuildInside()
+    end
+	if k == 1 then
+	  move.back(3)
+	  move.up()
+	end
+  end
+  getMoreCobble2()
+  turtle.turnLeft()
+  move.forward(2)
+  move.down()
+  move.left(2)
+  for k=1, 2, 1 do
+    for i=1, 3, 1 do
+      move.forward()
+	  move.right(2)
+  	  innerBuildInside()
+    end
+	if k == 1 then
+	  move.back(3)
+	  move.up()
+	end
+  end
+  
+  for i=1, 2, 1 do
+    move.forward(2)
+    move.down()
+    for k=1, 2, 1 do
+      for i=1, 3, 1 do
+        move.forward()
+	    move.right(2)
+  	    innerBuildInside()
+      end
+	  if k == 1 then
+	    move.back(3)
+	    move.up()
+	  end
+    end
+  end
+  
+  doSide(true)
+  doSide(false)
+  doSide(true, 2)
+  
+  turtle.turnLeft()
+  move.forward(2)
+  move.down(2)
+  move.left(2)
+  do3x3Thing(3)
+  
+  move.forward(2)
+  move.down(2)
+  do3x3Thing(3)
+  
+  turtle.turnLeft()
+  move.forward(2)
+  turtle.turnLeft()
+  move.back()
+  move.down(2)
+  do3x3Thing(3)
+  move.forward(2)
+  move.down(2)
+  do3x3Thing(3)
+end
+
+local function collectWater()
+  selectWater1()
+  turtle.placeDown() 
+  sleep(0.5)
+  selectWater2()
+  turtle.placeDown()
+end
+
+local function makeInfinitePool()
+  move.up(2)
+  move.forward(8)
+  move.down()
+  selectCobble()
+  turtle.placeDown()
+  for i=1, 2, 1 do
+    move.right()
+    selectCobble()
+    turtle.placeDown()
+  end
+  move.right()
+  move.up()
+  selectCobble()
+  turtle.placeDown()
+  move.forward()
+  move.left()
+  for i=1, 3, 1 do
+    selectCobble()
+    turtle.placeDown()
+	move.left()
+  end
+  move.back()
+  turtle.placeDown() 
+  move.back()
+  for i=1, 3, 1 do
+	move.right()
+    selectCobble()
+    turtle.placeDown()
+  end 
+  
+  move.forward()
+  selectWater1()
+  turtle.placeDown()
+  move.left(2)
+  
+  selectWater2()
+  turtle.placeDown()
+  move.right() 
+  collectWater()
+end
+
+local function destroyInfinitePool() 
+  move.left()
+  selectCobble()
+  turtle.placeDown()
+  turtle.digDown()
+  for i=1, 2, 1 do
+    move.right()
+    selectCobble()
+    turtle.placeDown()
+	turtle.digDown()
+  end
+  
+  move.down()
+  
+  turtle.select(1)
+  for i=1, 3, 1 do
+    turtle.dig()
+    turtle.turnRight()
+    turtle.dig()
+    turtle.turnRight()
+    turtle.dig()
+    turtle.digDown()
+    turtle.turnRight()
+    turtle.forward()
+    turtle.turnRight()
+  end 
+  turtle.turnLeft()
+  turtle.dig()
+end
+
+local function addWater() 
+  makeInfinitePool()
+  
+  move.turnAround()
+  move.forward(3)
+  move.right(2) 
+  move.down(4)
+  selectWater1()
+  turtle.placeDown() 
+  move.up(2)
+  move.left(4)
+  move.down()
+  selectWater2()
+  turtle.placeDown() 
+  
+  move.up(3)
+  move.back(3)
+  move.right(2) 
+  collectWater() 
+  
+  move.forward(3)
+  move.left(3)
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.up()
+  move.left(3)
+  move.forward(3)
+  move.down()
+  selectWater2()
+  turtle.placeDown()
+  move.up()
+  move.back(3)
+  move.up(2)
+  move.back(3)
+  move.right(6)
+  collectWater()
+  
+  move.left(6)
+  move.forward(7)
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.up()
+  move.forward(4)
+  move.down(2)
+  selectWater2()
+  turtle.placeDown()
+  move.up(2)
+  move.back(8)
+  move.up(2)
+  move.back(3)
+  move.right(6)
+  collectWater()
+  
+  move.left(6)
+  move.forward(12)
+  move.down(4)
+  selectWater1()
+  turtle.placeDown()
+  move.up(2)
+  move.forward(4)
+  move.down()
+  selectWater2()
+  turtle.placeDown()
+  move.up()
+  move.back(13)
+  move.up(2)
+  move.back(3)
+  move.right(6)
+  collectWater() 
+  move.left(6)
+  move.forward(17)
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.up()
+  move.forward(3)
+  move.right(3)
+  move.down()
+  selectWater2()
+  turtle.placeDown()
+  move.up(3)
+  move.back(20)
+  move.right(3)
+  collectWater()
+  
+  move.left(2)
+  move.forward(20)
+  
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.up()
+  move.right(4)
+  move.down(2)
+  selectWater2()
+  turtle.placeDown()
+  move.up(4)
+  move.back(20)
+  move.left(2)
+  collectWater()
+  
+  move.right(6)
+  move.forward(3)
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.right()
+  selectWater2()
+  turtle.placeDown()
+  move.up(3)
+  move.back(3)
+  move.left(7)
+  collectWater()
+  
+  move.right(10)
+  move.forward(6)
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.forward()
+  selectWater2()
+  turtle.placeDown()
+  move.up(3)
+  move.back(7)
+  move.left(10)
+  collectWater()
+  
+  move.right(10)
+  move.forward(11)
+  move.down(4)
+  selectWater1()
+  turtle.placeDown()
+  move.forward()
+  selectWater2()
+  turtle.placeDown()
+  move.up(4)
+  move.back(12)
+  move.left(10) 
+  collectWater()
+  
+  move.right(10)
+  move.forward(16)
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.forward()
+  selectWater2()
+  turtle.placeDown()
+  move.up(3)
+  move.back(17)
+  move.left(10) 
+  collectWater()
+  
+  move.right(7)
+  move.forward(20)
+  move.down(3)
+  selectWater1()
+  turtle.placeDown()
+  move.left()
+  selectWater2()
+  turtle.placeDown()
+  move.up(3)
+  move.back(20)
+  move.left(6) 
+  collectWater() 
+  
+  destroyInfinitePool()
+end
+
+local function buildRoof() 
+  move.up()
+  turtle.turnRight()
+  move.forward(3)
+  move.right(11)
+  move.down()
+  
+  house.cleanupHouseObject()
+  house.ceiling(19, 20, { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 } )
+end
+
+local function finalTouches() --[[
+  turtle.turnRight()
+  selectCobble()
+  turtle.dig()
+  move.forward(2)
+  move.turnAround()
+  selectCobble()
+  turtle.place()
+  move.turnAround() --]]
+  move.down(31)
+end
+
+--breakDownOne()
+--buildFallArea()
+--buildFloor()
+--getMoreCobble1()
+--buildWalls()
+--buildInside()
+--addWater()
+--buildRoof()
+finalTouches()

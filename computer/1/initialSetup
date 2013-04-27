@@ -36,7 +36,6 @@ function cobble.onGet()
 	cobble.movedToSlot9 = true
   end
 end
-turtle.select(5)
 shell.run("getMoarCobblestone")
 move.right(4)
 move.forward(8)
@@ -53,3 +52,68 @@ turtle.select(1)
 -- 8: 64 Planks
 -- 9: 64 Cobblestone
 shell.run("buildFirstHouse")
+-- Inventory looks like:
+-- 1: Bucket
+-- 2: Water Bucket
+-- 3: Water Bucket
+-- 4: 48 Wood
+-- 5: 64 Cobblestone 
+-- 6: 1 Sapling
+-- 7: ~35 Dirt
+-- 8: 4 Planks
+-- 9: 48 Cobblestone
+move.back(3)
+move.up()
+move.left(2)
+
+turtle.select(4)
+turtle.dropDown()
+turtle.select(6)
+turtle.dropDown() -- we can tell them apart because of the stack size later
+turtle.select(8)
+turtle.dropDown()
+move.right(2)
+move.forward(3)
+-- Inventory looks like:
+-- 1: Bucket
+-- 2: Water Bucket
+-- 3: Water Bucket
+-- 4: Empty
+-- 5: 64 Cobblestone 
+-- 6: Empty
+-- 7: ~35 Dirt
+-- 8: Empty
+-- 9: 48 Cobblestone
+turtle.select(5)
+turtle.transferTo(4)
+turtle.select(9)
+turtle.transferTo(5)
+turtle.select(7)
+turtle.transferTo(16)
+-- Inventory looks like:
+-- 1: Bucket
+-- 2: Water Bucket
+-- 3: Water Bucket
+-- 4: 64 Cobblestone 
+-- 5: 48 Cobblestone 
+-- ...
+-- 16: ~35 dirt
+
+turtle.select(1)
+move.forward(8)
+move.left()
+move.down()
+
+cobble = { }
+function cobble.hasEnough()
+  return turtle.getItemSpace(15) == 0
+end
+
+function cobble.onGet() 
+  
+end
+shell.run("getMoarCobblestone")
+move.turnAround()
+move.forward(8)
+move.down()
+shell.run("makeInitialMobFarm")
